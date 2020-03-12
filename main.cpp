@@ -12,33 +12,45 @@ struct __RetStruct {
     int denominator; // nämnare
 };
 
-
 __RetStruct largest_quota(int* arr, int size)
 {
     if( size <= 2 )
     {
         return __RetStruct{
-            largest : (arr[0] < arr[1]) ? 1 : 0,
-            smallest : (arr[0] > arr[1]) ? 1 : 0,
-            denominator : 0,
-            nominator : 1,
+            (arr[0] < arr[1]) ? 1 : 0,
+            (arr[0] > arr[1]) ? 1 : 0,
+            1,
+            0,
         };
     }
     else if ( size == 3 )
     {
         __RetStruct ret;
-        if (arr[0] > arr[1])
+
+        double first_middle_q = (double)arr[1]/(double)arr[0];
+        double middle_last_q = (double)arr[2]/(double)arr[1];
+        double first_last_q = (double)arr[2]/(double)arr[0];
+
+        if( first_middle_q > middle_last_q && first_middle_q > first_last_q )
         {
-            ret.denominator = 1;
+            ret.nominator = 1;
+            ret.denominator = 0;
+        }
+        else if( middle_last_q > first_last_q && middle_last_q > first_middle_q )
+        {
             ret.nominator = 2;
+            ret.denominator = 1;
         }
         else
         {
+            ret.nominator = 2;
             ret.denominator = 0;
-            ret.nominator = (arr[1] <= arr[2]) ? 2 : 1;
         }
-        ret.largest  = (arr[0] < arr[1]) ? ((arr[1] > arr[2]) ? 1 : 2) : 0; // Find MAX
-        ret.smallest = (arr[0] > arr[1]) ? ((arr[1] < arr[2]) ? 1 : 2) : 0; // Find MIN
+
+        ret.largest = (arr[0] < arr[1]) ? 1 : 0; // Find MAX
+        ret.largest = (arr[ret.largest] < arr[2]) ? 2 : ret.largest;
+        ret.smallest = (arr[0] > arr[1]) ? 1 : 0; // Find MAX
+        ret.smallest = (arr[ret.smallest] > arr[2]) ? 2 : ret.smallest;
         return ret;
     }
     else
@@ -61,7 +73,7 @@ __RetStruct largest_quota(int* arr, int size)
             ret.nominator = left.nominator;
             ret.denominator = left.denominator;
         }
-        else if( right_q > qouta )
+        else if( right_q > qouta && right_q > left_q )
         {
             ret.nominator = right.nominator;
             ret.denominator = right.denominator;
@@ -105,9 +117,11 @@ __RetStruct largest_qouta_bad(int* arr, int size)
     return ret;
 }
 
-
 int main(int argc, char *argv[])
 {
+    //
+    // CUSTOM TEST CASES
+    //
     int custom_test_arr[5][9] = {
         {3,2,8,6,3,2,8,6,1},
         {9,8,7,6,5,4,3,2,1},
@@ -116,9 +130,9 @@ int main(int argc, char *argv[])
         {2,2,2,2,2,2,1,1,1},
     };
 
-    for(int i = 0; i < 5; i++)
+    for(int i = 0; i < sizeof(custom_test_arr)/sizeof(custom_test_arr[0]); i++)
     {
-        __RetStruct ret = largest_quota(custom_test_arr[i], 9);
+        __RetStruct ret = largest_quota(custom_test_arr[i], sizeof(custom_test_arr[0])/sizeof(custom_test_arr[0][0]));
         cout << custom_test_arr[i][ret.nominator] << '/' << custom_test_arr[i][ret.denominator] << " " << custom_test_arr[i][ret.largest] << "|" << custom_test_arr[i][ret.smallest] << endl;
     }
 
@@ -126,8 +140,9 @@ int main(int argc, char *argv[])
     //
     // TEST PARAMETERS
     //
-    int size = 8;
-    int n_tests = 1000;
+    int size = 1000;
+    int n_tests = 10000;
+
     int seed = time(NULL);
 
 
@@ -136,7 +151,6 @@ int main(int argc, char *argv[])
     for (int _test = 0; _test < n_tests; _test++)
     {
         srand(seed);
-
         for (int i = 0; i < size; i++)
             test_arr[i] = rand() % 10000 +1;
 
@@ -150,7 +164,7 @@ int main(int argc, char *argv[])
             cout << test_arr[bres.nominator] << '/' << test_arr[bres.denominator] << " [" << bres.nominator << "]/[" << bres.denominator << "]" << endl;
             n_fails++;
         }
-        seed *=3;
+        seed *= 3 + 1;
     }
 
     cout << "Failed " << n_fails << " times out of " << n_tests << " tests." << endl;
