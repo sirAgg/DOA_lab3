@@ -27,6 +27,10 @@ __RetStruct largest_quota(int* arr, int size)
     {
         __RetStruct ret;
 
+        //
+        // In a list of size 3 there are 3 possible quotas
+        // calculate and find the best one of them
+        //
         double first_middle_q = (double)arr[1]/(double)arr[0];
         double middle_last_q = (double)arr[2]/(double)arr[1];
         double first_last_q = (double)arr[2]/(double)arr[0];
@@ -47,10 +51,14 @@ __RetStruct largest_quota(int* arr, int size)
             ret.denominator = 0;
         }
 
-        ret.largest = (arr[0] < arr[1]) ? 1 : 0; // Find MAX
+        // find largest number
+        ret.largest = (arr[0] < arr[1]) ? 1 : 0;
         ret.largest = (arr[ret.largest] < arr[2]) ? 2 : ret.largest;
-        ret.smallest = (arr[0] > arr[1]) ? 1 : 0; // Find MAX
+
+        // find smallest number
+        ret.smallest = (arr[0] > arr[1]) ? 1 : 0;
         ret.smallest = (arr[ret.smallest] > arr[2]) ? 2 : ret.smallest;
+
         return ret;
     }
     else
@@ -87,7 +95,6 @@ __RetStruct largest_quota(int* arr, int size)
         ret.largest = (arr[left.largest] < arr[right.largest]) ? right.largest : left.largest;
         ret.smallest = (arr[left.smallest] > arr[right.smallest]) ? right.smallest : left.smallest;
 
-        // cout << ret.nominator << '/' << ret.denominator << " " << ret.largest << "|" << ret.smallest << endl;
         return ret;
     }
 }
